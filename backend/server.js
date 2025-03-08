@@ -6,7 +6,21 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cors());
+
+
+
+const allowedOrigins = [
+  "https://viceofdice.netlify.app/",
+];
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,// Allow cookies 
+  })
+);
+
 
 // Routes
 const registerRoutes = require('./routes/register');
