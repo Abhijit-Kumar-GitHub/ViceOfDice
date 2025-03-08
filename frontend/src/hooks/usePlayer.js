@@ -31,7 +31,7 @@ export default function usePlayer() {
 
   const fetchBalance = async (id) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/balance/${id}`);
+      const response = await fetch(`https://viceofdicedb.onrender.comapi/balance/${id}`);
       const data = await response.json();
 
       if (!response.ok) {
