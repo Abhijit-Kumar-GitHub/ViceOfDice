@@ -11,7 +11,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-gray-800 text-white py-4 px-6 flex justify-between items-center">
+    <nav className="fixed w-[100vw] h-[8vh] bg-gray-800 text-white py-4 px-6 flex justify-between items-center">
       <h1 className="text-2xl font-bold">🎲 ViceOfDice</h1>
       <div className="flex space-x-4">
         <Link to="/" className="hover:text-gray-400">Home</Link>

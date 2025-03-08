@@ -51,49 +51,78 @@ export default function DiceRoller() {
   }
 
   return (
-    <div className="text-center text-white">
-      <div className="mb-6 text-2xl font-bold text-green-400">
-        💳 Balance: {balance} Coins
+    <div className="text-center items-start justify-center text-white flex flex-col lg:flex-row gap-6">
+      {/* Dice Game Section */}
+      <div className="flex flex-col items-center jusitfy-center w-full p-4">
+        <div className="mb-6 text-2xl w-[25vw] font-bold text-green-400">
+          💳 Balance: {balance} Coins
+        </div>
+
+        <input
+          
+          type="number"
+          placeholder="Enter bet amount"
+          value={betAmount}
+          onChange={(e) => setBetAmount(e.target.value)}
+          className="px-4 py-2 border rounded-md text-white mb-4 w-[17vw] bg-gray-900"
+        />
+        <button
+          onClick={rollDice}
+          className="w-[17vw] px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-md text-white text-lg"
+          disabled={loading}
+        >
+          {loading ? "Rolling..." : "Roll Dice 🎲"}
+        </button>
+
+        {error && <p className="mt-4 text-red-500">{error}</p>}
+
+        {/* Display Game Outcome */}
+        {gameOutcome?.gameOutcome && (
+          <div className="w-[40vw] mt-6 p-4 border rounded-md bg-gray-800">
+            <h2 className="text-xl font-bold mb-2">Game Outcome</h2>
+            <p>🎲 Dice Roll: {gameOutcome.gameOutcome.diceRoll}</p>
+            <p>📢 Result: {gameOutcome.gameOutcome.result?.toUpperCase() || "N/A"}</p>
+            <p>💰 Payout: {gameOutcome.winnings || 0}</p>
+            <p>💳 New Balance: {gameOutcome.newBalance}</p>
+            <p className="text-gray-400 text-sm">🕒 {new Date(gameOutcome.gameOutcome.timestamp).toLocaleString()}</p>
+          </div>
+        )}
+
+        {/* Transaction History */}
+        {history.length > 0 && (
+          <div className="w-[40vw] mt-8 p-4 border rounded-md bg-gray-800">
+            <h2 className="text-xl font-bold mb-2">Transaction History</h2>
+            <ul className="space-y-2 text-sm">
+              {history.map((item, index) => (
+                <li key={index} className="border-b pb-2 last:border-b-0">
+                  🎲 Roll: {item.gameOutcome?.diceRoll || "N/A"} | 
+                  📢 {item.gameOutcome?.result?.toUpperCase() || "N/A"} | 
+                  💰 {item.gameOutcome?.winnings || 0}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
-      <input
-        type="number"
-        placeholder="Enter bet amount"
-        value={betAmount}
-        onChange={(e) => setBetAmount(e.target.value)}
-        className="px-4 py-2 border rounded-md text-white mb-4 w-full bg-gray-900"
-      />
-      <button
-        onClick={rollDice}
-        className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-md text-white text-lg"
-        disabled={loading}
-      >
-        {loading ? "Rolling..." : "Roll Dice 🎲"}
-      </button>
+      {/* Provably Fair Section */}
+      {gameOutcome?.provablyFair && (
+        <div className="w-[40vw] p-4 border rounded-md bg-gray-800 text-left">
+          <h2 className="text-xl font-bold text-green-400 mb-2">🎲 Provably Fair</h2>
+          <p className="text-sm text-gray-300">
+            The dice roll is generated using a secure SHA-256 hash, ensuring fairness. 
+            You can verify the outcome by hashing the server and client seeds.
+          </p>
+          <div className="mt-4 p-3 bg-gray-900 rounded-md text-xs overflow-x-auto">
+            <p className="text-gray-400">🖥️ <strong>Server Seed:</strong></p>
+            <p className="break-all">{gameOutcome.provablyFair.serverSeed}</p>
 
-      {error && <p className="mt-4 text-red-500">{error}</p>}
+            <p className="mt-2 text-gray-400">📱 <strong>Client Seed:</strong></p>
+            <p className="break-all">{gameOutcome.provablyFair.clientSeed}</p>
 
-      {gameOutcome && (
-        <div className="mt-6 p-4 border rounded-md bg-gray-800">
-          <h2 className="text-xl font-bold mb-2">Game Outcome</h2>
-          <p>🎲 Dice Roll: {gameOutcome.gameOutcome.diceRoll}</p>
-          <p>📢 Result: {gameOutcome.gameOutcome.result.toUpperCase()}</p>
-          <p>💰 Payout: {gameOutcome.gameOutcome.payout}</p>
-          <p>💳 New Balance: {gameOutcome.newBalance}</p>
-          <p className="text-gray-400 text-sm">🕒 {new Date(gameOutcome.gameOutcome.timestamp).toLocaleString()}</p>
-        </div>
-      )}
-
-      {history.length > 0 && (
-        <div className="mt-8 p-4 border rounded-md bg-gray-800">
-          <h2 className="text-xl font-bold mb-2">Transaction History</h2>
-          <ul className="space-y-2 text-sm">
-            {history.map((item, index) => (
-              <li key={index} className="border-b pb-2 last:border-b-0">
-                🎲 Roll: {item.gameOutcome.diceRoll} | 📢 {item.gameOutcome.result.toUpperCase()} | 💰 {item.gameOutcome.payout}
-              </li>
-            ))}
-          </ul>
+            <p className="mt-2 text-gray-400">🔗 <strong>SHA-256 Hash:</strong></p>
+            <p className="break-all">{gameOutcome.provablyFair.hash}</p>
+          </div>
         </div>
       )}
     </div>

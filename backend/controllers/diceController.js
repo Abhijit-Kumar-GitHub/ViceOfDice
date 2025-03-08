@@ -9,13 +9,11 @@ const rollDice = async (req, res) => {
       return res.status(400).json({ error: 'Invalid player ID or bet amount' });
     }
 
-    // Fetch player details
     const player = await getPlayerById(playerId);
     if (!player) {
       return res.status(404).json({ error: 'Player not found' });
     }
     if (betAmount > player.balance) {
-      console.log(player.balance);
       return res.status(400).json({ error: 'Insufficient balance' });
     }
 
@@ -23,12 +21,11 @@ const rollDice = async (req, res) => {
     const serverSeed = crypto.randomBytes(16).toString('hex');
     const clientSeed = crypto.randomBytes(16).toString('hex');
     const hash = crypto.createHash('sha256').update(serverSeed + clientSeed).digest('hex');
-    const diceRoll = (parseInt(hash.substring(0, 2), 16) % 6) + 1; // number 1-6
+    const diceRoll = (parseInt(hash.substring(0, 2), 16) % 6) + 1; // 1-6
 
     let newBalance, winnings = 0, result;
     if (diceRoll >= 4) {
-      // winnings = betAmount * 2;                // right now what is happening is that if bet 100 of 1000 after winning i am getting 1200 instead of 1100.
-      winnings = betAmount * 1;                       // so i have changed it to betAmount
+      winnings = betAmount;  // Corrected winnings calculation
       newBalance = player.balance + winnings;
       result = 'win';
     } else {
@@ -36,19 +33,23 @@ const rollDice = async (req, res) => {
       result = 'lose';
     }
 
-    // Update player's balance
     const updatedPlayer = await updatePlayerBalance(playerId, newBalance);
-
-    // Log game outcome (optional)
-    const gameOutcome = await logGameOutcome(playerId, betAmount, diceRoll, result, winnings);
-
+    
+    // Ensure gameOutcome always has a proper structure
+    const gameOutcome = await logGameOutcome(playerId, betAmount, diceRoll, result, winnings) || {};
+    
     res.json({
       message: result === 'win' ? 'You win!' : 'You lose!',
       diceRoll,
       winnings,
       newBalance: updatedPlayer.balance,
       provablyFair: { serverSeed, clientSeed, hash },
-      gameOutcome
+      gameOutcome: {
+        diceRoll: gameOutcome?.dice_roll || diceRoll, 
+        result: gameOutcome?.result || result, 
+        winnings: gameOutcome?.winnings || winnings,
+        timestamp: gameOutcome?.created_at || new Date().toISOString()
+      }
     });
   } catch (error) {
     console.error('Dice Roll Error:', error);
