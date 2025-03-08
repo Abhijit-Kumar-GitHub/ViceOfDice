@@ -1,10 +1,14 @@
 const pool = require('../db');
 
-const createPlayer = async (username, playerId, initialBalance = 1000) => {
-  const query = 'INSERT INTO players (id, username, balance) VALUES ($1, $2, $3) RETURNING *';
-  const values = [playerId, username, initialBalance];
+const createPlayer = async (username, playerId) => {
+  const query = `
+    INSERT INTO players (id, username, balance) 
+    VALUES ($1, $2, 1000) 
+    RETURNING id, username, balance;
+  `;
+  const values = [playerId, username];
   const result = await pool.query(query, values);
-  return result.rows[0];
+  return result.rows[0]; // Return only relevant fields
 };
 
 const getPlayerById = async (playerId) => {

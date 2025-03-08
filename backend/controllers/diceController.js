@@ -15,6 +15,7 @@ const rollDice = async (req, res) => {
       return res.status(404).json({ error: 'Player not found' });
     }
     if (betAmount > player.balance) {
+      console.log(player.balance);
       return res.status(400).json({ error: 'Insufficient balance' });
     }
 
@@ -27,7 +28,7 @@ const rollDice = async (req, res) => {
     let newBalance, winnings = 0, result;
     if (diceRoll >= 4) {
       // winnings = betAmount * 2;                // right now what is happening is that if bet 100 of 1000 after winning i am getting 1200 instead of 1100.
-      winnings = betAmount;                       // so i have changed it to betAmount
+      winnings = betAmount * 1;                       // so i have changed it to betAmount
       newBalance = player.balance + winnings;
       result = 'win';
     } else {
